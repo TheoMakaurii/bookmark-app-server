@@ -37,6 +37,14 @@ describe.only('Bookmarks Endpoints', function() {
                         .expect(200, testItems)
                 })
             })
+
+            context(`Given no bookmarks`, () => {
+                it(`responds with 200 and an empty list`, () => {
+                  return supertest(app)
+                    .get('/bookmarks')
+                    .expect(200, [])
+                })
+            })
         })
 
     describe('GET /bookmarks/:id', ()=>{

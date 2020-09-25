@@ -19,7 +19,15 @@ const BookmarksService = {
             .select('*')
             .where({id})
             .first()
-    }
+    },
+
+    deleteBookmark(knex, id){
+        return knex('bookmarks_table')
+            .where({id})
+            .delete()
+    },
+
+    
 
     
 

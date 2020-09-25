@@ -47,6 +47,7 @@ describe.only('Bookmarks Endpoints', function() {
             })
         })
     describe(`POST /bookmarks`, ()=>{
+
         it(`creates an item, responding with 201 and the new bookmark`, function(){
             const newItem={
                 url: 'https://www.test.com',
@@ -88,8 +89,32 @@ describe.only('Bookmarks Endpoints', function() {
             })
         })
 
+    describe(`DELETE /bookmarks/:bookmark_id`, () => {
+        context('Given there are items in the database', () => {
+           const testItems = makeBookmarksArray()
+         
+          beforeEach('insert bookmarks', () => {
+            return db
+              .into('bookmarks_table')
+              .insert(testItems)
+              })
+         
+            it('responds with 204 and removes the bookmark', () => {
+            const idToRemove = 1
+            const expectedBookmarks = testItems.filter(bookmark => bookmark.id !== idToRemove)
+            return supertest(app)
+                .delete(`/bookmarks/${idToRemove}`)
+                .expect(204)
+                .then(res =>
+                  supertest(app)
+                    .get(`/bookmarks`)
+                    .expect(expectedBookmarks)
+                 )
+            })
+        })
+    })
 
-    describe('GET /bookmarks/:id', ()=>{
+    describe('GET /bookmarks/:bookmark_id', ()=>{
 
         context(`Given no items`, ()=>{
             it(`responds with 404`, ()=>{

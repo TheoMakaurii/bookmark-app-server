@@ -38,10 +38,10 @@ bookmarksRouter
   })
 
 bookmarksRouter
-  .route('/:id')
+  .route('/:bookmark_id')
   .get((req, res, next) => {
     const knexInstance = req.app.get('db')
-    BookmarksService.getById(knexInstance, req.params.id)
+    BookmarksService.getById(knexInstance, req.params.bookmark_id)
       .then(data => {
         if (!data) {
           return res.status(404).json({
@@ -50,7 +50,18 @@ bookmarksRouter
         }
         res.json(data)
       })
-      .catch(next)
-  })
+        .catch(next)
+    })
+    .delete((req, res, next)=>{
+        BookmarksService.deleteBookmark(
+        req.app.get('db'),
+        req.params.bookmark_id
+        )
+        .then(()=>{
+        res.status(204).end()
+            })
+        .catch(next)
+        })
+
 
 module.exports = bookmarksRouter

@@ -46,12 +46,54 @@ describe.only('Bookmarks Endpoints', function() {
                 })
             })
         })
+    describe(`POST /bookmarks`, ()=>{
+        it(`creates an item, responding with 201 and the new bookmark`, function(){
+            const newItem={
+                url: 'https://www.test.com',
+                title: 'Test',
+                rating: 3,
+                description: 'A testing site'
+            }
+            return supertest(app)
+            .post('/bookmarks')
+            .send(newItem)
+            .expect(201)
+            .expect(res =>{
+                expect(res.body.url).to.eql(newItem.url)
+                expect(res.body.title).to.eql(newItem.title)
+                expect(res.body.rating).to.eql(newItem.rating)
+                expect(res.body.description).to.eql(newItem.description)
+                expect(res.body).to.have.property('id')
+                expect(res.headers.location).to.eql(`/bookmarks/${res.body.id}`)
+            })
+ 
+                .then(postRes=>
+                    supertest(app)
+                        .get(`/bookmarks/${postRes.body.id}`)
+                        .expect(postRes.body)
+                )
+            })
+
+            it(`responds with 400 and an error message when the title is missing`, ()=>{
+                return supertest(app)
+                .post('/bookmarks')
+                .send({
+                    url: 'https://www.test.com',
+                    rating: 3,
+                    description: 'A testing site'
+                })
+                .expect(400, {
+                    error: {message: `Missing title!`}
+                })
+            })
+        })
+
 
     describe('GET /bookmarks/:id', ()=>{
 
         context(`Given no items`, ()=>{
             it(`responds with 404`, ()=>{
-                const id =12345
+                const id =12345  
                 return supertest(app)
                     .get(`/bookmarks/${id}`)
                     .expect(404, {error:{message: `Bookmark doesn't exist`}})
